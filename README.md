@@ -1,10 +1,13 @@
-<p align="center">
+<div align="center">
+<pre>
 EEEEEEE  LL       IIIIII  ZZZZZZZ   AAAAA 
 EE       LL         II        ZZ   AA   AA
 EEEEE    LL         II      ZZZ    AAAAAAA
 EE       LL         II     ZZ      AA   AA
 EEEEEEE  LLLLLLL  IIIIII  ZZZZZZZ  AA   AA
-</p>
+</pre>
+
+</div>
 
 <!-- -----------------------  Header  ----------------------------- -->
 <h1 align="center">ELIZA</h1>
