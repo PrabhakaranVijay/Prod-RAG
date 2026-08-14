@@ -1,0 +1,128 @@
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.*
+*.env
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =========================
+# Node.js / Frontend
+# =========================
+node_modules/
+.next/
+out/
+dist/
+coverage/
+
+# Package Managers
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# macOS
+# =========================
+.DS_Store
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Databases
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Vector Databases
+# =========================
+chroma/
+chromadb/
+vectorstore/
+vectorstores/
+faiss_index/
+*.faiss
+
+# =========================
+# ML / AI
+# =========================
+mlruns/
+wandb/
+.cache/
+models/
+checkpoints/
+artifacts/
+
+# Hugging Face
+.huggingface/
+hf_cache/
+
+# Ollama
+ollama_models/
+
+# =========================
+# Uploaded Files
+# =========================
+uploads/
+documents/
+temp/
+tmp/
+
+# =========================
+# Secrets
+# =========================
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+
+# =========================
+# Docker
+# =========================
+docker-data/
+docker-volumes/
+
+# =========================
+# OS Files
+# =========================
+Thumbs.db
