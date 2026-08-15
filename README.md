@@ -1,13 +1,3 @@
-<div align="center">
-<pre>
-EEEEEEE  LL       IIIIII  ZZZZZZZ   AAAAA 
-EE       LL         II        ZZ   AA   AA
-EEEEE    LL         II      ZZZ    AAAAAAA
-EE       LL         II     ZZ      AA   AA
-EEEEEEE  LLLLLLL  IIIIII  ZZZZZZZ  AA   AA
-</pre>
-
-</div>
 <!-- -----------------------  Header  ----------------------------- -->
 <h1 align="center">Production Grade RAG System</h1>
 
