@@ -1,7 +1,22 @@
 from app.embeddings.embedding_factory import EmbeddingFactory
 
 
-def test_embedding_vector_shape():
+class _FakeEmbeddingModel:
+    def embed_query(self, text: str):
+        return [float(len(text)), 1.0]
+
+
+class _FakeBGEEmbeddings:
+    def get_embedding_model(self):
+        return _FakeEmbeddingModel()
+
+
+def test_embedding_vector_shape(monkeypatch):
+    monkeypatch.setattr(
+        "app.embeddings.embedding_factory.BGEEmbeddings",
+        _FakeBGEEmbeddings,
+    )
+
     embeddings = EmbeddingFactory.create_embedding()
     vector = embeddings.embed_query("What is RAG?")
 

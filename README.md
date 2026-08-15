@@ -8,9 +8,8 @@ EEEEEEE  LLLLLLL  IIIIII  ZZZZZZZ  AA   AA
 </pre>
 
 </div>
-
 <!-- -----------------------  Header  ----------------------------- -->
-<h1 align="center">ELIZA</h1>
+<h1 align="center">Production Grade RAG System</h1>
 
 <p align="center">
 
@@ -54,7 +53,7 @@ EEEEEEE  LLLLLLL  IIIIII  ZZZZZZZ  AA   AA
 
 ## 🎯 Project Overview
 
-**ELIZA** - Named after the world's first chatbot, ELIZA is my personal AI home assistant designed to unify voice interaction, knowledge retrieval, automation, and intelligent decision-making across my digital and physical environment. Inspired by JARVIS, ELIZA connects calendars, email, notes, home automation, local infrastructure, and AI models into a single conversational interface.
+<!-- **ELIZA** - Named after the world's first chatbot, ELIZA is my personal AI home assistant designed to unify voice interaction, knowledge retrieval, automation, and intelligent decision-making across my digital and physical environment. Inspired by JARVIS, ELIZA connects calendars, email, notes, home automation, local infrastructure, and AI models into a single conversational interface. -->
 
 ---
 
