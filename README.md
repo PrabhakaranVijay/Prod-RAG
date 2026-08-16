@@ -7,17 +7,17 @@
   
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/PrabhakaranVijay/ELIZA?color=E10600">
 
-  <img alt="Github language count" src="https://img.shields.io/github/languages/count/PrabhakaranVijay/ELIZA?color=E10600">
+  <img alt="Github language count" src="https://img.shields.io/github/languages/count/PrabhakaranVijay/Prod-RAG?color=E10600">
 
-  <img alt="Repository size" src="https://img.shields.io/github/repo-size/PrabhakaranVijay/ELIZA?color=E10600">
+  <img alt="Repository size" src="https://img.shields.io/github/repo-size/PrabhakaranVijay/Prod-RAG?color=E10600">
 
-  <img alt="License" src="https://img.shields.io/github/license/PrabhakaranVijay/ELIZA?color=E10600">
+  <img alt="License" src="https://img.shields.io/github/license/PrabhakaranVijay/Prod-RAG?color=E10600">
 
-  <img alt="Github issues" src="https://img.shields.io/github/issues/PrabhakaranVijay/ELIZA?color=E10600" />
+  <img alt="Github issues" src="https://img.shields.io/github/issues/PrabhakaranVijay/Prod-RAG?color=E10600" />
 
-  <img alt="Github forks" src="https://img.shields.io/github/forks/PrabhakaranVijay/ELIZA?color=E10600" />
+  <img alt="Github forks" src="https://img.shields.io/github/forks/PrabhakaranVijay/Prod-RAG?color=E10600" />
 
-  <img alt="Github stars" src="https://img.shields.io/github/stars/PrabhakaranVijay/ELIZA?color=E10600" />
+  <img alt="Github stars" src="https://img.shields.io/github/stars/PrabhakaranVijay/Prod-RAG?color=E10600" />
 </p>
 
 <h4 align="center"> 
@@ -44,6 +44,49 @@
 ## 🎯 Project Overview
 
 <!-- **ELIZA** - Named after the world's first chatbot, ELIZA is my personal AI home assistant designed to unify voice interaction, knowledge retrieval, automation, and intelligent decision-making across my digital and physical environment. Inspired by JARVIS, ELIZA connects calendars, email, notes, home automation, local infrastructure, and AI models into a single conversational interface. -->
+
+---
+
+## 🚀 Getting Started
+
+### 1) Install Dependencies
+
+```bash
+uv sync
+```
+
+### 2) Configure Environment Variables
+
+Create a `.env` file in the project root and copy values from `.env.example`.
+
+Required values:
+
+- `GROQ_API_KEY`
+- `LLM_MODEL` (default: `llama-3.3-70b-versatile`)
+- `EMBEDDING_MODEL` (default: `BAAI/bge-m3`)
+- `RERANKER_MODEL` (default: `BAAI/bge-reranker-v2-m3`)
+
+### 3) Run The App
+
+Ask with default prompt:
+
+```bash
+uv run python -m app.main
+```
+
+Ask with your own question:
+
+```bash
+uv run python -m app.main "What does the handbook say about leave policy?"
+```
+
+The app automatically indexes `data/raw/company_handbook.txt` when present and answers using Groq + RAG retrieval.
+
+### 4) Run Tests
+
+```bash
+uv run python -m pytest
+```
 
 ---
 

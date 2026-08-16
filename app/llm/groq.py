@@ -2,13 +2,18 @@ import logging
 
 from langchain_groq import ChatGroq
 
+from app.config.settings import settings
+
 
 def get_groq_llm():
     """
     Returns a ChatGroq instance with the specified model and temperature.
     """
-    logging.info("Initializing ChatGroq with model 'llama-3.3-70b-versatile' and temperature 0.")
+    logging.info(
+        "Initializing ChatGroq with model '%s' and temperature 0.",
+        settings.LLM_MODEL,
+    )
     return ChatGroq(
-        model="llama-3.3-70b-versatile",
-        temperature=0
+        model=settings.LLM_MODEL,
+        temperature=0,
     )

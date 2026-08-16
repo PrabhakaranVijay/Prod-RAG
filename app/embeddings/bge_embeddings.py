@@ -1,5 +1,6 @@
 from langchain_huggingface import HuggingFaceEmbeddings
 
+from app.config.settings import settings
 from app.config.logging import logger
 
 
@@ -7,10 +8,11 @@ class BGEEmbeddings:
 
     def __init__(
         self,
-        model_name: str = "BAAI/bge-m3", # 1,024 dimensions
+        model_name: str | None = None,
         device: str = "cpu",
         normalize_embeddings: bool = True,
     ):
+        model_name = model_name or settings.EMBEDDING_MODEL
 
         logger.info(
             f"Loading embedding model: {model_name}"

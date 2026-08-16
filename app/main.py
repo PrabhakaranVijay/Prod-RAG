@@ -1,25 +1,25 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-# from langchain_openai import ChatOpenAI
-# from langchain_anthropic import ChatAnthropic
-from langchain_groq import ChatGroq
+import sys
+from pathlib import Path
+
+from app.chains.rag_chain import RAGChain
 
 def main ():
-    # OpenAI setup
-    # llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, max_tokens=100)
-    # response = llm.invoke("say 'setup complete' in one sentence")
-    # print(response)
-    # print(os.getenv("OPENAI_API_KEY"))
+    question = " ".join(sys.argv[1:]).strip() or "What does the company handbook say about the project?"
+    chain = RAGChain()
 
-    llm = ChatGroq(
-        model="llama-3.3-70b-versatile",
-        temperature=0
-    )
+    handbook_path = Path("data/raw/company_handbook.txt")
+    if handbook_path.exists():
+        chain.index_source(
+            source=str(handbook_path),
+            metadata={"source": "company_handbook"},
+        )
 
-    response = llm.invoke("Say setup complete in one sentence.")
+    response = chain.ask(question)
 
-    print(response.content)
+    print(response.answer)
 
 if __name__ == "__main__":
     main()
