@@ -46,6 +46,100 @@
 <!-- **ELIZA** - Named after the world's first chatbot, ELIZA is my personal AI home assistant designed to unify voice interaction, knowledge retrieval, automation, and intelligent decision-making across my digital and physical environment. Inspired by JARVIS, ELIZA connects calendars, email, notes, home automation, local infrastructure, and AI models into a single conversational interface. -->
 
 ---
+enterprise-grade-multimodel-rag/
+│
+├── app/
+│   │
+│   ├── main.py
+│   │
+│   ├── config/
+│   │   ├── settings.py
+│   │   ├── logging.py
+│   │   └── constants.py
+│   │
+│   ├── llms/
+│   │   ├── provider.py
+│   │   ├── groq.py
+│   │   ├── huggingface.py
+│   │   ├── ollama.py
+│   │   └── router.py
+│   │
+│   ├── embeddings/
+│   │   ├── embedding_factory.py
+│   │   └── bge_embeddings.py
+│   │
+│   ├── vectorstore/
+│   │   ├── pgvector.py
+│   │   ├── chroma.py
+│   │   └── qdrant.py
+│   │
+│   ├── ingestion/
+│   │   ├── loader.py
+│   │   ├── chunker.py
+│   │   ├── metadata.py
+│   │   └── pipeline.py
+│   │
+│   ├── retrieval/
+│   │   ├── hybrid_search.py
+│   │   ├── bm25.py
+│   │   ├── vector_search.py
+│   │   └── retriever.py
+│   │
+│   ├── reranking/
+│   │   ├── bge_reranker.py
+│   │   └── reranker.py
+│   │
+│   ├── chains/
+│   │   ├── rag_chain.py
+│   │   ├── query_rewrite.py
+│   │   ├── answer_generation.py
+│   │   └── citation_chain.py
+│   │
+│   ├── evaluation/
+│   │   ├── ragas_eval.py
+│   │   ├── retrieval_eval.py
+│   │   └── llm_eval.py
+│   │
+│   ├── observability/
+│   │   ├── langfuse_client.py
+│   │   ├── mlflow_client.py
+│   │   └── tracing.py
+│   │
+│   ├── api/
+│   │   ├── routes.py
+│   │   ├── schemas.py
+│   │   └── dependencies.py
+│   │
+│   └── utils/
+│       ├── helpers.py
+│       ├── file_utils.py
+│       └── tokenizer.py
+│
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   └── embeddings/
+│
+├── experiments/
+│   ├── notebooks/
+│   └── evaluation_results/
+│
+├── tests/
+│   ├── test_llms.py
+│   ├── test_retrieval.py
+│   ├── test_reranking.py
+│   └── test_rag.py
+│
+├── .env
+├── .env.example
+├── requirements.txt
+├── pyproject.toml
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
+└── .gitignore
+
+---
 
 ## 🚀 Getting Started
 

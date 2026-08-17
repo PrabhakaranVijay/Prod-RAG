@@ -8,6 +8,7 @@ from langchain_core.documents import Document
 
 from app.config.constants import TOP_K
 from app.retrieval.bm25 import BM25Retriever
+from app.reranking.reranker import Reranker
 from app.retrieval.vector_search import VectorSearchRetriever
 
 
@@ -29,12 +30,14 @@ class HybridRetriever:
 		self,
 		vector_search: VectorSearchRetriever,
 		bm25_retriever: BM25Retriever,
+		reranker: Reranker | None = None,
 		vector_weight: float = 0.5,
 		bm25_weight: float = 0.5,
 		rrf_k: float = 60.0,
 	) -> None:
 		self.vector_search = vector_search
 		self.bm25_retriever = bm25_retriever
+		self.reranker = reranker
 		self.vector_weight = vector_weight
 		self.bm25_weight = bm25_weight
 		self.rrf_k = rrf_k
@@ -96,5 +99,8 @@ class HybridRetriever:
 			metadata["bm25_rank"] = item.bm25_rank
 			results.append(Document(page_content=item.document.page_content, metadata=metadata))
 
-		return results
+		if self.reranker is None:
+			return results
+
+		return self.reranker.rerank(query=query, documents=results, top_k=top_k)
 

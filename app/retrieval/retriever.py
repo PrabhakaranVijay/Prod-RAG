@@ -9,6 +9,7 @@ from app.config.constants import CHUNK_OVERLAP, CHUNK_SIZE, TOP_K
 from app.ingestion.pipeline import IngestionPipeline
 from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid_search import HybridRetriever
+from app.reranking.reranker import Reranker
 from app.retrieval.vector_search import VectorSearchRetriever
 
 
@@ -25,6 +26,7 @@ class Retriever:
 		vector_search: VectorSearchRetriever | None = None,
 		bm25_retriever: BM25Retriever | None = None,
 		hybrid_retriever: HybridRetriever | None = None,
+		reranker: Reranker | None = None,
 		**vector_store_kwargs: Any,
 	) -> None:
 		self.config = config or RetrieverConfig()
@@ -33,6 +35,7 @@ class Retriever:
 		self.hybrid_retriever = hybrid_retriever or HybridRetriever(
 			vector_search=self.vector_search,
 			bm25_retriever=self.bm25_retriever,
+			reranker=reranker,
 		)
 
 	def index_documents(self, documents: list[Document]) -> None:

@@ -4,6 +4,7 @@ from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid_search import HybridRetriever
 from app.retrieval.retriever import Retriever, RetrieverConfig
 from app.retrieval.vector_search import VectorSearchRetriever
+from app.reranking.reranker import Reranker
 
 
 class FakeVectorStore:
@@ -28,6 +29,15 @@ class FakeVectorStore:
 
     def search(self, query, top_k):
         return self.search_results[:top_k]
+
+
+class FakeReranker(Reranker):
+    def __init__(self):
+        self.calls = []
+
+    def score(self, query, documents):
+        self.calls.append((query, documents))
+        return [document.metadata.get("rerank_score", 0.0) for document in documents]
 
 
 def test_vector_search_retriever_delegates_to_vector_store():
@@ -97,16 +107,48 @@ def test_hybrid_retriever_combines_vector_and_bm25_rankings():
     assert results[0].metadata["vector_rank"] == 1
 
 
+def test_hybrid_retriever_can_rerank_fused_results():
+    fake_vector_store = FakeVectorStore()
+    fake_vector_store.search_results = [
+        Document(page_content="alpha handbook entry", metadata={"id": "alpha", "source": "vector"}),
+        Document(page_content="beta handbook entry", metadata={"id": "beta", "source": "vector"}),
+    ]
+    vector_search = VectorSearchRetriever(vector_store=fake_vector_store)
+    bm25_retriever = BM25Retriever(
+        [
+            Document(page_content="beta handbook entry", metadata={"id": "beta", "source": "bm25"}),
+            Document(page_content="alpha handbook entry", metadata={"id": "alpha", "source": "bm25"}),
+        ]
+    )
+    reranker = FakeReranker()
+
+    reranker.score = lambda query, documents: [0.1, 0.9]
+
+    hybrid_retriever = HybridRetriever(
+        vector_search=vector_search,
+        bm25_retriever=bm25_retriever,
+        reranker=reranker,
+    )
+
+    results = hybrid_retriever.search("handbook", top_k=2)
+
+    assert [result.metadata["id"] for result in results] == ["beta", "alpha"]
+    assert results[0].metadata["rerank_score"] == 0.9
+
+
 def test_retriever_facade_dispatches_by_mode(monkeypatch):
     fake_vector_store = FakeVectorStore()
     fake_vector_store.search_results = [Document(page_content="vector result", metadata={"id": "vector"})]
     vector_search = VectorSearchRetriever(vector_store=fake_vector_store)
     bm25_retriever = BM25Retriever([Document(page_content="bm25 result", metadata={"id": "bm25"})])
+    reranker = FakeReranker()
+    reranker.score = lambda query, documents: [document.metadata.get("rerank_score", 0.0) for document in documents]
 
     retriever = Retriever(
         config=RetrieverConfig(mode="hybrid", top_k=1),
         vector_search=vector_search,
         bm25_retriever=bm25_retriever,
+        reranker=reranker,
     )
 
     hybrid_results = retriever.search("result")
