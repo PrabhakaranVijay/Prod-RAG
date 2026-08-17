@@ -5,7 +5,7 @@
 
   <img alt="profile views" src="https://komarev.com/ghpvc/?username=PrabhakaranVijay&label=Profile%20Views&color=E10600&style=flat"/>
   
-  <img alt="Github top language" src="https://img.shields.io/github/languages/top/PrabhakaranVijay/ELIZA?color=E10600">
+  <img alt="Github top language" src="https://img.shields.io/github/languages/top/PrabhakaranVijay/Prod-RAG?color=E10600">
 
   <img alt="Github language count" src="https://img.shields.io/github/languages/count/PrabhakaranVijay/Prod-RAG?color=E10600">
 
@@ -46,6 +46,7 @@
 <!-- **ELIZA** - Named after the world's first chatbot, ELIZA is my personal AI home assistant designed to unify voice interaction, knowledge retrieval, automation, and intelligent decision-making across my digital and physical environment. Inspired by JARVIS, ELIZA connects calendars, email, notes, home automation, local infrastructure, and AI models into a single conversational interface. -->
 
 ---
+```bash
 enterprise-grade-multimodel-rag/
 │
 ├── app/
@@ -138,7 +139,7 @@ enterprise-grade-multimodel-rag/
 ├── Dockerfile
 ├── README.md
 └── .gitignore
-
+```
 ---
 
 ## 🚀 Getting Started
