@@ -1,7 +1,9 @@
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+from app.core.config import settings
 
-TOP_K = 10
+CHUNK_SIZE = settings.CHUNK_SIZE
+CHUNK_OVERLAP = settings.CHUNK_OVERLAP
+
+TOP_K = settings.RAG_TOP_K
 RERANK_TOP_K = 5
 
 DEFAULT_COLLECTION = "documents"

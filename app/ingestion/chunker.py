@@ -1,9 +1,12 @@
-import logging
+from time import perf_counter
 from typing import List
+
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-logger = logging.getLogger(__name__)
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 class DocumentChunker:
 
@@ -16,6 +19,7 @@ class DocumentChunker:
         """
         Splits documents into smaller chunks using RecursiveCharacterTextSplitter.
         """
+        start = perf_counter()
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
@@ -27,8 +31,14 @@ class DocumentChunker:
         chunks = text_splitter.split_documents(documents)
         
         logger.info(
-            f"Split {len(documents)} source documents into {len(chunks)} chunks "
-            f"(size={chunk_size}, overlap={chunk_overlap})."
+            "Document chunking completed",
+            extra={
+                "latency_ms": int((perf_counter() - start) * 1000),
+                "input_tokens": None,
+                "output_tokens": None,
+                "document_count": len(documents),
+                "chunk_count": len(chunks),
+            },
         )
         return chunks
 
@@ -41,6 +51,7 @@ class DocumentChunker:
         """
         Recursively splits documents into smaller chunks.
         """
+        start = perf_counter()
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap, 
@@ -48,8 +59,15 @@ class DocumentChunker:
             add_start_index=True,
             separators=["\n\n", "\n", " ", ""],
         )
+        chunks = splitter.split_documents(documents)
         logger.info(
-            f"Recursively splitting {len(documents)} documents into chunks "
-            f"(size={chunk_size}, overlap={chunk_overlap})."
+            "Document chunking completed",
+            extra={
+                "latency_ms": int((perf_counter() - start) * 1000),
+                "input_tokens": None,
+                "output_tokens": None,
+                "document_count": len(documents),
+                "chunk_count": len(chunks),
+            },
         )
-        return splitter.split_documents(documents)
+        return chunks

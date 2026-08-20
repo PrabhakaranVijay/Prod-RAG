@@ -1,8 +1,3 @@
-import logging
+from app.core.logging import configure_logging, get_logger, logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-)
-
-logger = logging.getLogger("enterprise-rag")
+configure_logging()

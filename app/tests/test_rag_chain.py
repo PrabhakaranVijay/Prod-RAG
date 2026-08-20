@@ -69,3 +69,36 @@ def test_rag_chain_indexes_source_and_documents():
     assert retriever.index_source_calls[0]["source"] == "data/raw/company_handbook.txt"
     assert retriever.index_source_calls[0]["metadata"] == {"category": "docs"}
     assert retriever.index_documents_calls[0][0].page_content == "new entry"
+
+
+def test_rag_chain_extracts_usage_metadata_without_dropping_zeroes():
+    response = type(
+        "Response",
+        (),
+        {"usage_metadata": {"input_tokens": 0, "output_tokens": 3}},
+    )()
+
+    assert RAGChain._extract_usage(response) == {
+        "input_tokens": 0,
+        "output_tokens": 3,
+    }
+
+
+def test_rag_chain_extracts_response_metadata_token_usage():
+    response = type(
+        "Response",
+        (),
+        {
+            "response_metadata": {
+                "token_usage": {
+                    "prompt_tokens": 12,
+                    "completion_tokens": 4,
+                }
+            }
+        },
+    )()
+
+    assert RAGChain._extract_usage(response) == {
+        "input_tokens": 12,
+        "output_tokens": 4,
+    }

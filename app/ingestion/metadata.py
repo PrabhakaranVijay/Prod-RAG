@@ -1,8 +1,10 @@
-import logging
 from typing import List, Dict, Any
+
 from langchain_core.documents import Document
 
-logger = logging.getLogger(__name__)
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 class MetadataEnricher:
 
@@ -14,5 +16,13 @@ class MetadataEnricher:
         for doc in documents:
             doc.metadata.update(extra_metadata)
             
-        logger.info(f"Enriched {len(documents)} documents with metadata: {list(extra_metadata.keys())}")
+        logger.info(
+            "Document metadata enrichment completed",
+            extra={
+                "latency_ms": None,
+                "input_tokens": None,
+                "output_tokens": None,
+                "document_count": len(documents),
+            },
+        )
         return documents

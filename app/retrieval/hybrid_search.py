@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any
 
 from langchain_core.documents import Document
 
@@ -103,4 +101,3 @@ class HybridRetriever:
 			return results
 
 		return self.reranker.rerank(query=query, documents=results, top_k=top_k)
-

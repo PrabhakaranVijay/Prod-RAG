@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from time import perf_counter
 from typing import Any, Sequence
 
 from langchain_core.documents import Document
 
 from app.config.constants import TOP_K
+from app.core.logging import get_logger
 from app.vectorstore.chroma import ChromaVectorStore
+
+logger = get_logger(__name__)
 
 
 class VectorSearchRetriever:
@@ -38,5 +42,40 @@ class VectorSearchRetriever:
 		return self.vector_store.build_index_from_source(**kwargs)
 
 	def search(self, query: str, top_k: int = TOP_K) -> list[Document]:
-		return self.vector_store.search(query=query, top_k=top_k)
+		start = perf_counter()
+		logger.info(
+			"Vector retrieval started",
+			extra={"latency_ms": None, "input_tokens": None, "output_tokens": None},
+		)
+		try:
+			results = self.vector_store.search(query=query, top_k=top_k)
+		except Exception:
+			logger.exception(
+				"Vector retrieval failed",
+				extra={
+					"latency_ms": int((perf_counter() - start) * 1000),
+					"input_tokens": None,
+					"output_tokens": None,
+				},
+			)
+			raise
 
+		logger.info(
+			"Vector retrieval completed",
+			extra={
+				"latency_ms": int((perf_counter() - start) * 1000),
+				"input_tokens": None,
+				"output_tokens": None,
+				"result_count": len(results),
+			},
+		)
+		return results
+
+	def list_documents(self) -> list[Document]:
+		return self.vector_store.list_documents()
+
+	def delete_documents(self, ids: Sequence[str]) -> int:
+		return self.vector_store.delete_documents(ids)
+
+	def count(self) -> int:
+		return self.vector_store.count()

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from time import perf_counter
 from typing import Sequence
 
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
 from app.config.settings import settings
-from app.config.logging import logger
+from app.core.logging import get_logger
 from app.reranking.reranker import Reranker
+
+logger = get_logger(__name__)
 
 
 class BGEReranker(Reranker):
@@ -21,11 +24,23 @@ class BGEReranker(Reranker):
         self.device = device
         self.max_length = max_length
 
-        logger.info("Loading BGE reranker model: %s", self.model_name)
+        start = perf_counter()
+        logger.info(
+            "Loading BGE reranker model",
+            extra={"latency_ms": None, "input_tokens": None, "output_tokens": None},
+        )
         self.model = CrossEncoder(
             self.model_name,
             device=self.device,
             max_length=self.max_length,
+        )
+        logger.info(
+            "BGE reranker model loaded",
+            extra={
+                "latency_ms": int((perf_counter() - start) * 1000),
+                "input_tokens": None,
+                "output_tokens": None,
+            },
         )
 
     def score(self, query: str, documents: Sequence[Document]) -> list[float]:

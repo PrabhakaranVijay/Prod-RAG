@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from time import perf_counter
 from typing import Sequence
 
 from langchain_core.documents import Document
 
 from app.config.constants import RERANK_TOP_K
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -26,11 +30,46 @@ class Reranker(ABC):
         documents: Sequence[Document],
         top_k: int = RERANK_TOP_K,
     ) -> list[Document]:
+        start = perf_counter()
+        logger.info(
+            "Reranking started",
+            extra={"latency_ms": None, "input_tokens": None, "output_tokens": None},
+        )
+
         if not query.strip() or not documents:
+            logger.info(
+                "Reranking completed",
+                extra={
+                    "latency_ms": int((perf_counter() - start) * 1000),
+                    "input_tokens": None,
+                    "output_tokens": None,
+                    "document_count": 0,
+                },
+            )
             return []
 
-        scores = self.score(query=query, documents=documents)
+        try:
+            scores = self.score(query=query, documents=documents)
+        except Exception:
+            logger.exception(
+                "Reranking failed",
+                extra={
+                    "latency_ms": int((perf_counter() - start) * 1000),
+                    "input_tokens": None,
+                    "output_tokens": None,
+                },
+            )
+            raise
+
         if len(scores) != len(documents):
+            logger.error(
+                "Reranking failed",
+                extra={
+                    "latency_ms": int((perf_counter() - start) * 1000),
+                    "input_tokens": None,
+                    "output_tokens": None,
+                },
+            )
             raise ValueError("Reranker returned a score count that does not match the documents count.")
 
         ranked_documents = sorted(
@@ -54,4 +93,13 @@ class Reranker(ABC):
                 )
             )
 
+        logger.info(
+            "Reranking completed",
+            extra={
+                "latency_ms": int((perf_counter() - start) * 1000),
+                "input_tokens": None,
+                "output_tokens": None,
+                "document_count": len(results),
+            },
+        )
         return results

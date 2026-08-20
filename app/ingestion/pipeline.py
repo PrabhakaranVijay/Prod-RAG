@@ -1,11 +1,12 @@
-import logging
+from time import perf_counter
 
+from app.core.logging import get_logger
 from app.ingestion.chunker import DocumentChunker
 from app.ingestion.loader import DocumentLoader
 from app.ingestion.metadata import MetadataEnricher
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+
 
 class IngestionPipeline:
 
@@ -14,22 +15,45 @@ class IngestionPipeline:
         """
         Executes the full ingestion pipeline: Load -> Enrich Metadata -> Chunk.
         """
-        logger.info(f"Starting ingestion pipeline for source: {source}")
-
-        # 1. Load documents
-        raw_documents = DocumentLoader.load(source)
-
-        # 2. Add metadata
-        enriched_documents = MetadataEnricher.enrich(raw_documents, metadata)
-
-        # 3. Chunk documents
-        document_chunks = DocumentChunker.split(
-            enriched_documents, 
-            chunk_size=chunk_size, 
-            chunk_overlap=chunk_overlap
+        start = perf_counter()
+        logger.info(
+            "Ingestion pipeline started",
+            extra={"latency_ms": None, "input_tokens": None, "output_tokens": None},
         )
 
-        logger.info("Ingestion pipeline completed successfully.")
+        try:
+            # 1. Load documents
+            raw_documents = DocumentLoader.load(source)
+
+            # 2. Add metadata
+            enriched_documents = MetadataEnricher.enrich(raw_documents, metadata)
+
+            # 3. Chunk documents
+            document_chunks = DocumentChunker.split(
+                enriched_documents,
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap,
+            )
+        except Exception:
+            logger.exception(
+                "Ingestion pipeline failed",
+                extra={
+                    "latency_ms": int((perf_counter() - start) * 1000),
+                    "input_tokens": None,
+                    "output_tokens": None,
+                },
+            )
+            raise
+
+        logger.info(
+            "Ingestion pipeline completed",
+            extra={
+                "latency_ms": int((perf_counter() - start) * 1000),
+                "input_tokens": None,
+                "output_tokens": None,
+                "chunk_count": len(document_chunks),
+            },
+        )
         return document_chunks
 
 if __name__ == "__main__":
@@ -40,4 +64,12 @@ if __name__ == "__main__":
         chunk_size=500,
         chunk_overlap=50,
     )
-    print(f"Total chunks ready for vector store: {len(chunks)}")
+    logger.info(
+        "Ingestion pipeline example completed",
+        extra={
+            "latency_ms": None,
+            "input_tokens": None,
+            "output_tokens": None,
+            "chunk_count": len(chunks),
+        },
+    )

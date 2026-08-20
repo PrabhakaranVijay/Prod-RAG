@@ -1,16 +1,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import perf_counter
 from typing import Any
 
 from langchain_core.documents import Document
 
 from app.config.constants import CHUNK_OVERLAP, CHUNK_SIZE, TOP_K
+from app.core.logging import get_logger
 from app.ingestion.pipeline import IngestionPipeline
 from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid_search import HybridRetriever
 from app.reranking.reranker import Reranker
 from app.retrieval.vector_search import VectorSearchRetriever
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -38,9 +42,20 @@ class Retriever:
 			reranker=reranker,
 		)
 
-	def index_documents(self, documents: list[Document]) -> None:
-		self.vector_search.add_documents(documents)
+	def index_documents(self, documents: list[Document]) -> list[str]:
+		ids = self.vector_search.add_documents(documents)
 		self.bm25_retriever.index_documents(documents)
+		return ids
+
+	def list_documents(self) -> list[Document]:
+		return self.vector_search.list_documents()
+
+	def delete_documents(self, ids: list[str]) -> int:
+		deleted_count = self.vector_search.delete_documents(ids)
+		return deleted_count
+
+	def count_documents(self) -> int:
+		return self.vector_search.count()
 
 	def index_source(
 		self,
@@ -67,12 +82,46 @@ class Retriever:
 		limit = top_k or self.config.top_k
 		mode = self.config.mode.lower()
 
-		if mode == "vector":
-			return self.vector_search.search(query=query, top_k=limit)
-		if mode == "bm25":
-			return self.bm25_retriever.search(query=query, top_k=limit)
-		if mode == "hybrid":
-			return self.hybrid_retriever.search(query=query, top_k=limit)
+		start = perf_counter()
+		logger.info(
+			"Retrieval started",
+			extra={
+				"latency_ms": None,
+				"input_tokens": None,
+				"output_tokens": None,
+				"retrieval_mode": mode,
+			},
+		)
 
-		raise ValueError(f"Unsupported retrieval mode: {self.config.mode}")
+		try:
+			if mode == "vector":
+				results = self.vector_search.search(query=query, top_k=limit)
+			elif mode == "bm25":
+				results = self.bm25_retriever.search(query=query, top_k=limit)
+			elif mode == "hybrid":
+				results = self.hybrid_retriever.search(query=query, top_k=limit)
+			else:
+				raise ValueError(f"Unsupported retrieval mode: {self.config.mode}")
+		except Exception:
+			logger.exception(
+				"Retrieval failed",
+				extra={
+					"latency_ms": int((perf_counter() - start) * 1000),
+					"input_tokens": None,
+					"output_tokens": None,
+					"retrieval_mode": mode,
+				},
+			)
+			raise
 
+		logger.info(
+			"Retrieval completed",
+			extra={
+				"latency_ms": int((perf_counter() - start) * 1000),
+				"input_tokens": None,
+				"output_tokens": None,
+				"retrieval_mode": mode,
+				"result_count": len(results),
+			},
+		)
+		return results
