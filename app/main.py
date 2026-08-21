@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Prod-RAG API",
-    version="1.0.0",
+    version="0.1.0",
     description="Production-ready FastAPI server for the Prod-RAG application.",
     lifespan=lifespan,
 )
@@ -119,6 +119,8 @@ async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
     )
 
 
+from fastapi.encoders import jsonable_encoder
+
 @app.exception_handler(RequestValidationError)
 async def validation_error_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
     return JSONResponse(
@@ -127,7 +129,7 @@ async def validation_error_handler(_: Request, exc: RequestValidationError) -> J
             "error": {
                 "code": "VALIDATION_ERROR",
                 "message": "Request validation failed.",
-                "details": exc.errors(),
+                "details": jsonable_encoder(exc.errors()),
             }
         },
     )
@@ -147,9 +149,15 @@ async def unhandled_error_handler(_: Request, exc: Exception) -> JSONResponse:
     )
 
 
+@app.get("/", summary="Root endpoint", description="Returns basic API metadata.")
+async def root() -> dict[str, str]:
+    return {"name": "Prod-RAG API", "status": "ok", "version": "0.1.0"}
+
+
 app.include_router(health_router)
 app.include_router(chat_router)
 app.include_router(documents_router)
+
 
 
 def main() -> None:

@@ -1,5 +1,3 @@
-from langchain_groq import ChatGroq
-
 from app.core.config import settings
 from app.core.logging import get_logger
 
@@ -10,6 +8,8 @@ def get_groq_llm():
     """
     Returns a ChatGroq instance with the specified model and temperature.
     """
+    from langchain_groq import ChatGroq
+
     model = settings.LLM_MODEL
     if not model:
         raise ValueError("GROQ_MODEL must be configured before initializing ChatGroq.")

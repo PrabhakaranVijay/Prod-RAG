@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from typing import Any
+from typing_extensions import Self
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from app.config.constants import CHUNK_OVERLAP, CHUNK_SIZE
 
 
 class IngestRequest(BaseModel):
@@ -18,6 +21,15 @@ class IngestRequest(BaseModel):
         if not source:
             raise ValueError("source must not be empty")
         return source
+
+    @model_validator(mode="after")
+    def validate_chunks(self) -> Self:
+        chunk_size = self.chunk_size if self.chunk_size is not None else CHUNK_SIZE
+        chunk_overlap = self.chunk_overlap if self.chunk_overlap is not None else CHUNK_OVERLAP
+        if chunk_overlap >= chunk_size:
+            raise ValueError(f"chunk_overlap ({chunk_overlap}) must be less than chunk_size ({chunk_size})")
+        return self
+
 
 
 class DocumentItem(BaseModel):

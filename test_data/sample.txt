@@ -1,0 +1,8 @@
+Prod-RAG is a high-performance production-ready Retrieval-Augmented Generation system.
+It uses FastAPI for serving API requests, Chroma for vector store indexing, and BGE embeddings for semantic search.
+
+Document ingestion supports local text files, CSV files, PDF files, and web page URLs.
+The ingestion pipeline automatically splits documents into manageable text chunks, computes embedding vectors, and stores them in the vector database with metadata.
+
+Query processing involves hybrid retrieval, combining vector similarity search with BM25 keyword search, followed by reranking using BGE reranker.
+Finally, relevant context is passed to the Groq LLM model to generate precise, grounded answers.

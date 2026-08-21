@@ -40,7 +40,7 @@ def test_groq_llm_uses_settings_model(monkeypatch):
         def __init__(self, **kwargs):
             captured.update(kwargs)
 
-    monkeypatch.setattr(groq, "ChatGroq", FakeChatGroq)
+    monkeypatch.setattr("langchain_groq.ChatGroq", FakeChatGroq)
     monkeypatch.setattr(groq.settings, "LLM_MODEL", "env-chat-model")
 
     llm = groq.get_groq_llm()

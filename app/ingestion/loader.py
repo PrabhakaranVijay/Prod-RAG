@@ -10,6 +10,11 @@ from langchain_community.document_loaders import (
     WebBaseLoader,
 )
 
+from app.core.exceptions import (
+    DocumentNotFoundError,
+    DocumentParseError,
+    UnsupportedFileTypeError,
+)
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -40,11 +45,20 @@ class DocumentLoader:
 
         # Handle Web URLs directly
         if source.startswith(("http://", "https://")):
-            loader = WebBaseLoader(source)
-            return cls._log_and_return(loader.load(), start)
+            try:
+                loader = WebBaseLoader(source)
+                documents = loader.load()
+                return cls._log_and_return(documents, start)
+            except Exception as error:
+                logger.exception("Failed to load web document", extra={"source": source})
+                raise DocumentParseError(f"Failed to fetch or parse web URL '{source}': {error}") from error
 
         # Handle local files based on suffix
-        suffix = Path(source).suffix.lower()
+        path = Path(source)
+        if not path.exists():
+            raise DocumentNotFoundError(f"Local document file not found: {source}")
+
+        suffix = path.suffix.lower()
 
         loaders = {
             ".pdf": PyPDFLoader,
@@ -53,7 +67,13 @@ class DocumentLoader:
         }
 
         if suffix not in loaders:
-            raise ValueError(f"Unsupported file type: {suffix}")
+            raise UnsupportedFileTypeError(f"Unsupported file type '{suffix}'. Supported extensions: .pdf, .txt, .csv")
 
-        loader = loaders[suffix](source)
-        return cls._log_and_return(loader.load(), start)
+        try:
+            loader = loaders[suffix](str(path))
+            documents = loader.load()
+            return cls._log_and_return(documents, start)
+        except Exception as error:
+            logger.exception("Failed to parse local document", extra={"source": source})
+            raise DocumentParseError(f"Failed to parse document '{source}': {error}") from error
+

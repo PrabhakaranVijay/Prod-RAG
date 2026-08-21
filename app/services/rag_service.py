@@ -9,7 +9,7 @@ from langchain_core.documents import Document
 from app.config.constants import CHUNK_OVERLAP, CHUNK_SIZE
 from app.config.settings import settings
 from app.chains.rag_chain import RAGChain
-from app.core.exceptions import LLMError, RAGError, VectorStoreError
+from app.core.exceptions import AppError, LLMError, RAGError, VectorStoreError
 from app.core.logging import get_logger
 from app.ingestion.pipeline import IngestionPipeline
 from app.llm.groq import get_groq_llm
@@ -56,8 +56,14 @@ class RAGService:
             reranker=BGEReranker(),
             persist_directory=settings.CHROMA_PERSIST_DIRECTORY,
         )
-        self.chain = chain or RAGChain(retriever=self.retriever, llm=get_groq_llm(), top_k=settings.RAG_TOP_K)
+        self._chain = chain
         self.model_name = settings.LLM_MODEL
+
+    @property
+    def chain(self) -> RAGChain:
+        if self._chain is None:
+            self._chain = RAGChain(retriever=self.retriever, llm=get_groq_llm(), top_k=settings.RAG_TOP_K)
+        return self._chain
 
     def ask(self, question: str, rewrite: bool | None = None, top_k: int | None = None) -> ChatResult:
         should_rewrite = settings.RAG_REWRITE_QUERY if rewrite is None else rewrite
@@ -69,6 +75,8 @@ class RAGService:
         )
         try:
             response = self.chain.ask(question=question, rewrite=should_rewrite, top_k=limit)
+        except AppError:
+            raise
         except Exception as error:
             logger.exception(
                 "RAG request failed",
@@ -138,13 +146,16 @@ class RAGService:
                 chunk_size=resolved_chunk_size,
                 chunk_overlap=resolved_chunk_overlap,
             )
-            self.chain.index_documents(chunks)
+            self.retriever.index_documents(chunks)
+        except AppError:
+            raise
         except Exception as error:
             logger.exception(
                 "Document ingestion failed",
                 extra={
                     "error_code": "VECTOR_STORE_ERROR",
                     "latency_ms": int((perf_counter() - start) * 1000),
+                    "source": source,
                     "input_tokens": None,
                     "output_tokens": None,
                 },
@@ -156,6 +167,7 @@ class RAGService:
             "Document ingestion completed",
             extra={
                 "latency_ms": latency_ms,
+                "source": source,
                 "input_tokens": None,
                 "output_tokens": None,
                 "chunk_count": len(chunks),
@@ -167,6 +179,7 @@ class RAGService:
             chunks_created=len(chunks),
             source=source,
         )
+
 
     def list_documents(self) -> list[DocumentRecord]:
         try:
